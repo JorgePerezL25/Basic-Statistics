@@ -14,6 +14,39 @@ Proportionality and the linear relationship that exists between different variab
 Understanding Correlation
 Let's Suppose we have an "R" variable and an "S" variable. As R values increase, S values increase also. Similarly, when S values increase, R values are increased as well. Therefore there is a correlation between the R and S variables.
 
+Understanding basics Example:
+ For the next code we will explane how Correlation works with the languaje of Scala running in Spark environment.
+ 
+//We import the necesary liberys and packeages to load the programa
+import org.apache.spark.ml.linalg.{Matrix, Vectors}
+import org.apache.spark.ml.stat.Correlation
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.SparkSession
+
+//We create a an instance of the spark session
+val spark = SparkSession.builder.appName("CorrelationExample").getOrCreate()
+
+//We import a spark fuctions
+import spark.implicits._
+
+//Declaring the vectors we will use for this example, the differences beetween declaring a vector as sparse
+//or a vector dense is that the dense vector is backed by a double array representing its entry values, while a sparse vector is backed by two parallel arrays: indices and values.
+
+val data = Seq( Vectors.sparse(4, Seq((0, 1.0), (3, -2.0))),
+                 Vectors.dense(4.0, 5.0, 0.0, 3.0),
+                 Vectors.dense(6.0, 7.0, 0.0, 8.0),
+                 Vectors.sparse(4, Seq((0, 9.0), (3, 1.0))) )
+
+//
+val df = data.map(Tuple1.apply).toDF("features")
+val Row(coeff1: Matrix) = Correlation.corr(df, "features").head
+println(s"Pearson correlation matrix:\n $coeff1")
+
+val Row(coeff2: Matrix) = Correlation.corr(df, "features", "spearman").head
+println(s"Spearman correlation matrix:\n $coeff2")
+
+spark.stop()
+
 # Hypothesis testing 
 Hypothesis testing is a powerful tool in statistics to determine if a result is statistically significant, if this result occurs by chance or not.
 
