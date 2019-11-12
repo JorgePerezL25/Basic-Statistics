@@ -38,6 +38,73 @@ The available metrics are:
 
 # Code & Results 
 
+        #Correlation
+        
+        //We import the necesary liberys and packeages to load the program
+        import org.apache.spark.ml.linalg.{Matrix, Vectors}
+        import org.apache.spark.ml.stat.Correlation
+        import org.apache.spark.sql.Row
+        
+        //Declaring the vectors we will use for this example, the differences beetween declaring a vector as sparse //or a vector       dense is that the dense vector is backed by a double array representing its entry values, while a sparse vector is backed by two parallel arrays: indices and values. 
+        val data = Seq(
+          Vectors.sparse(4, Seq((0, 1.0), (3, -2.0))),
+          Vectors.dense(4.0, 5.0, 0.0, 3.0),
+          Vectors.dense(6.0, 7.0, 0.0, 8.0),
+          Vectors.sparse(4, Seq((0, 9.0), (3, 1.0)))
+        )
+        
+        // DataFrame data definition
+        val df = data.map(Tuple1.apply).toDF("features")
+        
+        //Differente methods to corralate the data , this one is with pearson
+        val Row(coeff1: Matrix) = Correlation.corr(df, "features").head
+        println(s"Pearson correlation matrix:\n $coeff1")
+        
+        //Corralation method Spearman
+        val Row(coeff2: Matrix) = Correlation.corr(df, "features", "spearman").head
+        println(s"Spearman correlation matrix:\n $coeff2")
+
+        #Results
+        
+        data: Seq[org.apache.spark.ml.linalg.Vector] = List((4,[0,3],[1.0,-2.0]), [4.0,5.0,0.0,3.0], [6.0,7.0,0.0,8.0], (4,[0,3],[9.0,1.0]))
+        df: org.apache.spark.sql.DataFrame = [features: vector]
+        +--------------------+
+        |            features|
+        +--------------------+
+        |(4,[0,3],[1.0,-2.0])|
+        |   [4.0,5.0,0.0,3.0]|
+        |   [6.0,7.0,0.0,8.0]|
+        | (4,[0,3],[9.0,1.0])|
+        +--------------------+
+
+        [Stage 2:>(0 + 2) / 2]19/11/11 23:56:29 WARN BLAS: Failed to load implementation from: com.github.fommil.netlib.NativeSystemBLAS
+        19/11/11 23:56:29 WARN BLAS: Failed to load implementation from: com.github.fommil.netlib.NativeRefBLAS
+        19/11/11 23:56:30 WARN PearsonCorrelation: Pearson correlation matrix contains NaN values.
+        coeff1: org.apache.spark.ml.linalg.Matrix =
+        1.0                   0.055641488407465814  NaN  0.4004714203168137
+        0.055641488407465814  1.0                   NaN  0.9135958615342522
+        NaN                   NaN                   1.0  NaN
+        0.4004714203168137    0.9135958615342522    NaN  1.0
+        Pearson correlation matrix:
+         1.0                   0.055641488407465814  NaN  0.4004714203168137  
+        0.055641488407465814  1.0                   NaN  0.9135958615342522  
+        NaN                   NaN                   1.0  NaN                 
+        0.4004714203168137    0.9135958615342522    NaN  1.0                 
+        19/11/11 23:56:32 WARN PearsonCorrelation: Pearson correlation matrix contains NaN values.
+        coeff2: org.apache.spark.ml.linalg.Matrix =
+        1.0                  0.10540925533894532  NaN  0.40000000000000174
+        0.10540925533894532  1.0                  NaN  0.9486832980505141
+        NaN                  NaN                  1.0  NaN
+        0.40000000000000174  0.9486832980505141   NaN  1.0
+        Spearman correlation matrix:
+         1.0                  0.10540925533894532  NaN  0.40000000000000174  
+        0.10540925533894532  1.0                  NaN  0.9486832980505141   
+        NaN                  NaN                  1.0  NaN                  
+        0.40000000000000174  0.9486832980505141   NaN  1.0                  
+        
+        
+        
+        
         # Hypothesis testing
         
         // Import the libraries
@@ -59,7 +126,7 @@ The available metrics are:
                        (0.0, Vectors.dense(3.5, 40.0)),
                        (1.0, Vectors.dense(3.5, 40.0)))
 
-        // DataFrame creation
+        // DataFrame creationgetOrCreate
         val df = data.toDF("label", "features")
 
         // Show DataFrame
@@ -169,5 +236,7 @@ The available metrics are:
 15510506 - Cabrera Reyes Ivan
 
 14212347 - Zavala Zuñiga Lineth
+
+15211255 - Perez Lomeli Jorge Lorenzo
 
 
